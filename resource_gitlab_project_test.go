@@ -23,7 +23,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
+					testAccCheckGitlabProjectExists("gitlabex_project.foo", &project),
 					testAccCheckGitlabProjectAttributes(&project, &testAccGitlabProjectExpectedAttributes{
 						Name:                 fmt.Sprintf("foo-%d", rInt),
 						Description:          "Terraform acceptance tests",
@@ -39,7 +39,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectUpdateConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
+					testAccCheckGitlabProjectExists("gitlabex_project.foo", &project),
 					testAccCheckGitlabProjectAttributes(&project, &testAccGitlabProjectExpectedAttributes{
 						Name:            fmt.Sprintf("foo-%d", rInt),
 						Description:     "Terraform acceptance tests!",
@@ -51,7 +51,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectExists("gitlab_project.foo", &project),
+					testAccCheckGitlabProjectExists("gitlabex_project.foo", &project),
 					testAccCheckGitlabProjectAttributes(&project, &testAccGitlabProjectExpectedAttributes{
 						Name:                 fmt.Sprintf("foo-%d", rInt),
 						Description:          "Terraform acceptance tests",
@@ -141,7 +141,7 @@ func testAccCheckGitlabProjectDestroy(s *terraform.State) error {
 	conn := testAccProvider.Meta().(*gitlab.Client)
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "gitlab_project" {
+		if rs.Type != "gitlabex_project" {
 			continue
 		}
 
@@ -161,7 +161,7 @@ func testAccCheckGitlabProjectDestroy(s *terraform.State) error {
 
 func testAccGitlabProjectConfig(rInt int) string {
 	return fmt.Sprintf(`
-resource "gitlab_project" "foo" {
+resource "gitlabex_project" "foo" {
   name = "foo-%d"
   description = "Terraform acceptance tests"
 
@@ -174,7 +174,7 @@ resource "gitlab_project" "foo" {
 
 func testAccGitlabProjectUpdateConfig(rInt int) string {
 	return fmt.Sprintf(`
-resource "gitlab_project" "foo" {
+resource "gitlabex_project" "foo" {
   name = "foo-%d"
   description = "Terraform acceptance tests!"
 

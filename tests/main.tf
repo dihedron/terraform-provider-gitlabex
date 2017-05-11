@@ -1,43 +1,21 @@
-provider "ldap" {
-  ldap_host = "localhost"
-  ldap_port = 389
-  use_tls = false
-  bind_user = "cn=admin,dc=example,dc=com"
-  bind_password = "admin"
+variable "tenant" {
+  type        = "string"
+  default     = "tenant-x"
 }
 
-resource "ldap_object" "foo" {
-  dn = "uid=foo"
-  base_dn = "dc=example,dc=com"
+provider "gitlabex" {
+#	token       		= ""
+	base_url 			  = "http://localhost/api/v3/"
+}
 
-  object_classes = [
-    "inetOrgPerson",
-    "posixAccount",
-  ]
+resource "gitlabex_group" "group01" {
+	name = "group01"
+	path ="path01"
+	description="my first test group"
+}
 
-  attribute {
-    name = "sn"
-    value = "10"
-  }
-  attribute {
-    name = "cn"
-    value = "bar"
-  }
-  attribute {
-    name = "uidNumber"
-    value = "1234"
-  }
-  attribute {
-    name = "gidNumber"
-    value = "1234"
-  }
-  attribute {
-    name = "homeDirectory"
-    value = "/home/billy"
-  }
-  attribute {
-    name = "loginShell"
-    value = "/bin/bash"
-  }
-
+resource "gitlabex_project" "infrastructure-repo" {
+	name        		= "${var.tenant}-infrastructure"
+	description 		= "The infrastructure configuration GitLab repository"
+	visibility_level 	= "public"
 }

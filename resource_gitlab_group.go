@@ -12,21 +12,24 @@ func resourceGitlabGroup() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceGitlabGroupCreate,
 		Read:   resourceGitlabGroupRead,
-		Update: resourceGitlabGroupUpdate,
+		//Update: resourceGitlabGroupUpdate,
 		Delete: resourceGitlabGroupDelete,
 
 		Schema: map[string]*schema.Schema{
 			"name": {
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 			"path": {
 				Type:     schema.TypeString,
 				Required: true,
+				ForceNew: true,
 			},
 			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
+				ForceNew: true,
 			},
 			/*
 				// this does not seem to be supported by gitlab.Group
@@ -64,6 +67,8 @@ func resourceGitlabGroupCreate(d *schema.ResourceData, meta interface{}) error {
 	options := &gitlab.CreateGroupOptions{
 		Name: gitlab.String(d.Get("name").(string)),
 		Path: gitlab.String(d.Get("path").(string)),
+		//LFSEnabled:           gitlab.Bool(d.Get("lfs_enabled").(bool)),
+		//RequestAccessEnabled: gitlab.Bool(d.Get("request_access_enabled").(bool)),
 	}
 
 	if v, ok := d.GetOk("description"); ok {
@@ -105,13 +110,18 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
+/*
 func resourceGitlabGroupUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 
 	// hmmmm looks like this one does not exist: how do we edit groups?
-	options := &gitlab.EditProjectOptions{}
+	options := &gitlab.EditGroupOptions{}
 
 	if d.HasChange("name") {
+		options.Name = gitlab.String(d.Get("name").(string))
+	}
+
+	if d.HasChange("path") {
 		options.Name = gitlab.String(d.Get("name").(string))
 	}
 
@@ -119,39 +129,28 @@ func resourceGitlabGroupUpdate(d *schema.ResourceData, meta interface{}) error {
 		options.Description = gitlab.String(d.Get("description").(string))
 	}
 
-	if d.HasChange("default_branch") {
-		options.DefaultBranch = gitlab.String(d.Get("description").(string))
-	}
-
 	if d.HasChange("visibility_level") {
 		options.VisibilityLevel = stringToVisibilityLevel(d.Get("visibility_level").(string))
 	}
 
-	if d.HasChange("issues_enabled") {
-		options.IssuesEnabled = gitlab.Bool(d.Get("issues_enabled").(bool))
+	if d.HasChange("lfs_enabled") {
+		options.LFSEnabled = gitlab.Bool(d.Get("lfs_enabled").(bool))
 	}
 
-	if d.HasChange("merge_requests_enabled") {
-		options.MergeRequestsEnabled = gitlab.Bool(d.Get("merge_requests_enabled").(bool))
+	if d.HasChange("request_access_enabled") {
+		options.RequestAccessEnabled = gitlab.Bool(d.Get("request_access_enabled").(bool))
 	}
 
-	if d.HasChange("wiki_enabled") {
-		options.WikiEnabled = gitlab.Bool(d.Get("wiki_enabled").(bool))
-	}
+	log.Printf("[DEBUG] update gitlab group %s", d.Id())
 
-	if d.HasChange("snippets_enabled") {
-		options.SnippetsEnabled = gitlab.Bool(d.Get("snippets_enabled").(bool))
-	}
-
-	log.Printf("[DEBUG] update gitlab project %s", d.Id())
-
-	_, _, err := client.Projects.EditProject(d.Id(), options)
+	_, _, err := client.Groups.EditGroup(d.Id(), options)
 	if err != nil {
 		return err
 	}
 
 	return resourceGitlabGroupRead(d, meta)
 }
+*/
 
 func resourceGitlabGroupDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)

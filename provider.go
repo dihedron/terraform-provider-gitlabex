@@ -25,8 +25,9 @@ func Provider() terraform.ResourceProvider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"gitlab_project":      resourceGitlabProject(),
-			"gitlab_project_hook": resourceGitlabProjectHook(),
+			"gitlabex_group":        resourceGitlabGroup(),
+			"gitlabex_project":      resourceGitlabProject(),
+			"gitlabex_project_hook": resourceGitlabProjectHook(),
 		},
 
 		ConfigureFunc: providerConfigure,

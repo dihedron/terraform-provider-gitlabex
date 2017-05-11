@@ -11,7 +11,7 @@ sufficiently mature.
 You can easily install the latest version with the following :
 
 ```
-go get -u github.com/dihedron/terraform-provider-gitlabv4
+go get -u github.com/dihedron/terraform-provider-gitlabex
 ```
 
 Then add the plugin to your local `.terraformrc` :
@@ -19,7 +19,7 @@ Then add the plugin to your local `.terraformrc` :
 ```
 cat >> ~/.terraformrc <<EOF
 providers {
-  gitlabv4 = "${GOPATH}/bin/terraform-provider-gitlabv4"
+  gitlabex = "${GOPATH}/bin/terraform-provider-gitlabex"
 }
 EOF
 ```

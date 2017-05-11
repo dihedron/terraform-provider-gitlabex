@@ -1,12 +1,9 @@
 version: '2'
 services:
-  openldap:
+  gitlab:
     environment:
-      LDAP_ORGANISATION: "Example Inc"
-      LDAP_DOMAIN: "example.com"
-      LDAP_ADMIN_PASSWORD: "admin"
-      LDAP_CONFIG_PASSWORD: "config"
-    image: osixia/openldap
+      GITLAB_TOKEN: "ZafY7QfD6WUAyMyerKzA"
+      GITLAB_BASE_URL: "http://localhost:8080/api/v3"
+    image: gitlab/gitlab-ce
     ports:
-      - "389:389"
-      - "636:636"
+      - "80:80"

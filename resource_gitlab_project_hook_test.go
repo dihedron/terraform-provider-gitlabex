@@ -24,7 +24,7 @@ func TestAccGitlabProjectHook_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectHookConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectHookExists("gitlab_project_hook.foo", &hook),
+					testAccCheckGitlabProjectHookExists("gitlabex_project_hook.foo", &hook),
 					testAccCheckGitlabProjectHookAttributes(&hook, &testAccGitlabProjectHookExpectedAttributes{
 						URL:                   fmt.Sprintf("https://example.com/hook-%d", rInt),
 						PushEvents:            true,
@@ -36,7 +36,7 @@ func TestAccGitlabProjectHook_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectHookUpdateConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectHookExists("gitlab_project_hook.foo", &hook),
+					testAccCheckGitlabProjectHookExists("gitlabex_project_hook.foo", &hook),
 					testAccCheckGitlabProjectHookAttributes(&hook, &testAccGitlabProjectHookExpectedAttributes{
 						URL:                   fmt.Sprintf("https://example.com/hook-%d", rInt),
 						PushEvents:            false,
@@ -55,7 +55,7 @@ func TestAccGitlabProjectHook_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectHookConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectHookExists("gitlab_project_hook.foo", &hook),
+					testAccCheckGitlabProjectHookExists("gitlabex_project_hook.foo", &hook),
 					testAccCheckGitlabProjectHookAttributes(&hook, &testAccGitlabProjectHookExpectedAttributes{
 						URL:                   fmt.Sprintf("https://example.com/hook-%d", rInt),
 						PushEvents:            true,
@@ -156,7 +156,7 @@ func testAccCheckGitlabProjectHookDestroy(s *terraform.State) error {
 	conn := testAccProvider.Meta().(*gitlab.Client)
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "gitlab_project" {
+		if rs.Type != "gitlabex_project" {
 			continue
 		}
 
@@ -176,7 +176,7 @@ func testAccCheckGitlabProjectHookDestroy(s *terraform.State) error {
 
 func testAccGitlabProjectHookConfig(rInt int) string {
 	return fmt.Sprintf(`
-resource "gitlab_project" "foo" {
+resource "gitlabex_project" "foo" {
   name = "foo-%d"
   description = "Terraform acceptance tests"
 
@@ -185,8 +185,8 @@ resource "gitlab_project" "foo" {
   visibility_level = "public"
 }
 
-resource "gitlab_project_hook" "foo" {
-	project = "${gitlab_project.foo.id}"
+resource "gitlabex_project_hook" "foo" {
+	project = "${gitlabex_project.foo.id}"
 	url = "https://example.com/hook-%d"
 }
 	`, rInt, rInt)
@@ -194,7 +194,7 @@ resource "gitlab_project_hook" "foo" {
 
 func testAccGitlabProjectHookUpdateConfig(rInt int) string {
 	return fmt.Sprintf(`
-resource "gitlab_project" "foo" {
+resource "gitlabex_project" "foo" {
   name = "foo-%d"
   description = "Terraform acceptance tests"
 
@@ -203,8 +203,8 @@ resource "gitlab_project" "foo" {
   visibility_level = "public"
 }
 
-resource "gitlab_project_hook" "foo" {
-	project = "${gitlab_project.foo.id}"
+resource "gitlabex_project_hook" "foo" {
+	project = "${gitlabex_project.foo.id}"
 	url = "https://example.com/hook-%d"
 	enable_ssl_verification = false
 	push_events = false
