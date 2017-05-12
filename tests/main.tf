@@ -3,19 +3,20 @@ variable "tenant" {
   default     = "tenant-x"
 }
 
-provider "gitlabex" {
+provider "zeus_gitlab" {
 #	token       		= ""
 	base_url 			  = "http://localhost/api/v3/"
 }
 
-resource "gitlabex_group" "group01" {
+resource "zeus_gitlab_group" "group01" {
 	name = "group01"
 	path ="path01"
 	description="my first test group"
 }
 
-resource "gitlabex_project" "infrastructure-repo" {
+resource "zeus_gitlab_project" "infrastructure-repo" {
 	name        		= "${var.tenant}-infrastructure"
+	path				= ${zeus_gitlab_group.group1.path}/${var.tenant}-infrastructure"
 	description 		= "The infrastructure configuration GitLab repository"
 	visibility_level 	= "public"
 }

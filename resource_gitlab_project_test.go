@@ -7,7 +7,6 @@ import (
 	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/xanzy/go-gitlab"
 )
 
 func TestAccGitlabProject_basic(t *testing.T) {
@@ -23,7 +22,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectExists("gitlabex_project.foo", &project),
+					testAccCheckGitlabProjectExists("zeus_gitlab_project.foo", &project),
 					testAccCheckGitlabProjectAttributes(&project, &testAccGitlabProjectExpectedAttributes{
 						Name:                 fmt.Sprintf("foo-%d", rInt),
 						Description:          "Terraform acceptance tests",
@@ -39,7 +38,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectUpdateConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectExists("gitlabex_project.foo", &project),
+					testAccCheckGitlabProjectExists("zeus_gitlab_project.foo", &project),
 					testAccCheckGitlabProjectAttributes(&project, &testAccGitlabProjectExpectedAttributes{
 						Name:            fmt.Sprintf("foo-%d", rInt),
 						Description:     "Terraform acceptance tests!",
@@ -51,7 +50,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectExists("gitlabex_project.foo", &project),
+					testAccCheckGitlabProjectExists("zeus_gitlab_project.foo", &project),
 					testAccCheckGitlabProjectAttributes(&project, &testAccGitlabProjectExpectedAttributes{
 						Name:                 fmt.Sprintf("foo-%d", rInt),
 						Description:          "Terraform acceptance tests",
@@ -141,7 +140,7 @@ func testAccCheckGitlabProjectDestroy(s *terraform.State) error {
 	conn := testAccProvider.Meta().(*gitlab.Client)
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "gitlabex_project" {
+		if rs.Type != "zeus_gitlab_project" {
 			continue
 		}
 
@@ -161,7 +160,7 @@ func testAccCheckGitlabProjectDestroy(s *terraform.State) error {
 
 func testAccGitlabProjectConfig(rInt int) string {
 	return fmt.Sprintf(`
-resource "gitlabex_project" "foo" {
+resource "zeus_gitlab_project" "foo" {
   name = "foo-%d"
   description = "Terraform acceptance tests"
 
@@ -174,7 +173,7 @@ resource "gitlabex_project" "foo" {
 
 func testAccGitlabProjectUpdateConfig(rInt int) string {
 	return fmt.Sprintf(`
-resource "gitlabex_project" "foo" {
+resource "zeus_gitlab_project" "foo" {
   name = "foo-%d"
   description = "Terraform acceptance tests!"
 
@@ -182,10 +181,10 @@ resource "gitlabex_project" "foo" {
   # with no billing
   visibility_level = "public"
 
-	issues_enabled = false
-	merge_requests_enabled = false
-	wiki_enabled = false
-	snippets_enabled = false
+  issues_enabled = false
+  merge_requests_enabled = false
+  wiki_enabled = false
+  snippets_enabled = false
 }
 	`, rInt)
 }

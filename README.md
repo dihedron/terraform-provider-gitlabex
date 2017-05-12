@@ -19,7 +19,7 @@ Then add the plugin to your local `.terraformrc` :
 ```
 cat >> ~/.terraformrc <<EOF
 providers {
-  gitlabex = "${GOPATH}/bin/terraform-provider-gitlabex"
+  zeus_gitlab = "${GOPATH}/bin/terraform-provider-zeus"
 }
 EOF
 ```

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 )
@@ -19,15 +21,15 @@ func Provider() terraform.ResourceProvider {
 			},
 			"base_url": {
 				Type:        schema.TypeString,
-				Optional:    true,
+				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("GITLAB_BASE_URL", ""),
 				Description: descriptions["base_url"],
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"gitlabex_group":        resourceGitlabGroup(),
-			"gitlabex_project":      resourceGitlabProject(),
-			"gitlabex_project_hook": resourceGitlabProjectHook(),
+			"zeus_gitlab_group":        resourceGitlabGroup(),
+			"zeus_gitlab_project":      resourceGitlabProject(),
+			"zeus_gitlab_project_hook": resourceGitlabProjectHook(),
 		},
 
 		ConfigureFunc: providerConfigure,
@@ -38,13 +40,13 @@ var descriptions map[string]string
 
 func init() {
 	descriptions = map[string]string{
-		"token": "The OAuth token used to connect to GitLab.",
-
-		"base_url": "The GitLab Base API URL",
+		"token":    "The OAuth token used to connect to GitLab.",
+		"base_url": "The GitLab Base API URL.",
 	}
 }
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
+	fmt.Println("being called", d.Get("token").(string), d.Get("base_url").(string))
 	config := Config{
 		Token:   d.Get("token").(string),
 		BaseURL: d.Get("base_url").(string),

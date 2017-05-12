@@ -32,4 +32,7 @@ func testAccPreCheck(t *testing.T) {
 	if v := os.Getenv("GITLAB_TOKEN"); v == "" {
 		t.Fatal("GITLAB_TOKEN must be set for acceptance tests")
 	}
+	if v := os.Getenv("GITLAB_BASE_URL"); v == "" {
+		t.Fatal("GITLAB_BASE_URL must be set for acceptance tests")
+	}
 }

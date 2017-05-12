@@ -7,7 +7,6 @@ import (
 	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
-	"github.com/xanzy/go-gitlab"
 )
 
 func TestAccGitlabGroup_basic(t *testing.T) {
@@ -23,10 +22,10 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 			{
 				Config: testAccGitlabGroupConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabGroupExists("gitlabex_group.foo", &group),
+					testAccCheckGitlabGroupExists("zeus_gitlab_group.foo", &group),
 					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
 						Name:        fmt.Sprintf("foo-%d", rInt),
-						Path:        fmt.Sprintf("foo-%d", rInt),
+						Path:        fmt.Sprintf("bar-%d", rInt),
 						Description: "Terraform acceptance tests",
 						/*
 							VisibilityLevel:      20,
@@ -40,10 +39,10 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 			{
 				Config: testAccGitlabGroupUpdateConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabGroupExists("gitlabex_group.foo", &group),
+					testAccCheckGitlabGroupExists("zeus_gitlab_group.foo", &group),
 					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
 						Name:        fmt.Sprintf("foo-%d", rInt),
-						Path:        fmt.Sprintf("foo-%d", rInt),
+						Path:        fmt.Sprintf("bar-%d", rInt),
 						Description: "Terraform acceptance tests!",
 						/*
 							VisibilityLevel: 20,
@@ -55,10 +54,10 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 			{
 				Config: testAccGitlabGroupConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabGroupExists("gitlabex_group.foo", &group),
+					testAccCheckGitlabGroupExists("zeus_gitlab_group.foo", &group),
 					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
 						Name:        fmt.Sprintf("foo-%d", rInt),
-						Path:        fmt.Sprintf("foo-%d", rInt),
+						Path:        fmt.Sprintf("bar-%d", rInt),
 						Description: "Terraform acceptance tests",
 						/*
 							VisibilityLevel:      20,
@@ -137,7 +136,7 @@ func testAccCheckGitlabGroupDestroy(s *terraform.State) error {
 	conn := testAccProvider.Meta().(*gitlab.Client)
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "gitlabex_group" {
+		if rs.Type != "zeus_gitlab_group" {
 			continue
 		}
 
@@ -157,9 +156,9 @@ func testAccCheckGitlabGroupDestroy(s *terraform.State) error {
 
 func testAccGitlabGroupConfig(rInt int) string {
 	return fmt.Sprintf(`
-resource "gitlabex_group" "foo" {
+resource "zeus_gitlab_group" "foo" {
   name = "foo-%d"
-  path = "foo-%d"
+  path = "bar-%d"
   description = "Terraform acceptance tests"
 
   # So that acceptance tests can be run in a gitlab organization
@@ -171,9 +170,9 @@ resource "gitlabex_group" "foo" {
 
 func testAccGitlabGroupUpdateConfig(rInt int) string {
 	return fmt.Sprintf(`
-resource "gitlabex_group" "foo" {
+resource "zeus_gitlab_group" "foo" {
   name = "foo-%d"
-  path = "foo-%d"
+  path = "bar-%d"
   description = "Terraform acceptance tests!"
 
   # So that acceptance tests can be run in a gitlab organization
