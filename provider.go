@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/hashicorp/terraform/helper/schema"
 	"github.com/hashicorp/terraform/terraform"
 )
@@ -47,8 +45,6 @@ func init() {
 }
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
-	// TODO: remove!
-	fmt.Println("being called", d.Get("token").(string), d.Get("base_url").(string))
 	config := Config{
 		Token:   d.Get("token").(string),
 		BaseURL: d.Get("base_url").(string),

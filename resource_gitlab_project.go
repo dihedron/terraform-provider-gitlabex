@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 
@@ -420,10 +419,7 @@ func resourceGitlabProjectUpdate(d *schema.ResourceData, meta interface{}) error
 		options.RequestAccessEnabled = gitlab.Bool(d.Get("request_access_enabled").(bool))
 	}
 
-	// TODO: remove this
-	data, _ := json.MarshalIndent(options, "", "  ")
-
-	log.Printf("[DEBUG] update gitlab project %s\n%s", d.Id(), string(data))
+	log.Printf("[DEBUG] update gitlab project %s", d.Id())
 
 	_, _, err := client.Projects.EditProject(d.Id(), options)
 	if err != nil {
