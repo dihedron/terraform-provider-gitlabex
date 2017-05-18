@@ -18,18 +18,19 @@ func Provider() terraform.ResourceProvider {
 				Required:    true,
 				DefaultFunc: schema.EnvDefaultFunc("GITLAB_TOKEN", nil),
 				Description: descriptions["token"],
+				Sensitive:   true,
 			},
 			"base_url": {
 				Type:        schema.TypeString,
-				Required:    true,
+				Optional:    true,
 				DefaultFunc: schema.EnvDefaultFunc("GITLAB_BASE_URL", ""),
 				Description: descriptions["base_url"],
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"zeus_gitlab_group":        resourceGitlabGroup(),
-			"zeus_gitlab_project":      resourceGitlabProject(),
-			"zeus_gitlab_project_hook": resourceGitlabProjectHook(),
+			"gitlabx_group":        resourceGitlabGroup(),
+			"gitlabx_project":      resourceGitlabProject(),
+			"gitlabx_project_hook": resourceGitlabProjectHook(),
 		},
 
 		ConfigureFunc: providerConfigure,
@@ -46,6 +47,7 @@ func init() {
 }
 
 func providerConfigure(d *schema.ResourceData) (interface{}, error) {
+	// TODO: remove!
 	fmt.Println("being called", d.Get("token").(string), d.Get("base_url").(string))
 	config := Config{
 		Token:   d.Get("token").(string),

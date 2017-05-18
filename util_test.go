@@ -36,7 +36,83 @@ func TestGitlab_validation(t *testing.T) {
 	}
 }
 
-func TestGitlab_visbilityHelpers(t *testing.T) {
+func TestGitlab_validateName(t *testing.T) {
+	// A Group/Project name can contain only letters, digits, '_', '.', dash and
+	// space.
+	cases := []struct {
+		String string
+		Errors int
+	}{
+		{
+			String: "My New App 02",
+			Errors: 0,
+		},
+		{
+			String: "My New App 02#",
+			Errors: 1,
+		},
+		{
+			String: "My New App - 02.",
+			Errors: 0,
+		},
+		{
+			String: "My New App - 02;",
+			Errors: 1,
+		},
+	}
+	for _, tc := range cases {
+		_, errors := validateName(tc.String, "name")
+		if len(errors) != tc.Errors {
+			t.Fatalf("got %d errors expected %d", len(errors), tc.Errors)
+		}
+	}
+}
+
+func TestGitlab_validatePath(t *testing.T) {
+	// A Group/Project name can contain only letters, digits, '_', '.', dash and
+	// space.
+	cases := []struct {
+		String string
+		Errors int
+	}{
+		{
+			String: "My New App 02",
+			Errors: 1,
+		},
+		{
+			String: "My New App 02#",
+			Errors: 1,
+		},
+		{
+			String: "My-New-App-02#",
+			Errors: 1,
+		},
+		{
+			String: "My New App - 02.",
+			Errors: 1,
+		},
+		{
+			String: "My New-App-02.",
+			Errors: 1,
+		},
+		{
+			String: "My New-App-02.atom",
+			Errors: 2,
+		},
+		{
+			String: "My New-App-02.git",
+			Errors: 2,
+		},
+	}
+	for _, tc := range cases {
+		_, errors := validatePath(tc.String, "path")
+		if len(errors) != tc.Errors {
+			t.Fatalf("%s - got %d errors expected %d", tc.String, len(errors), tc.Errors)
+		}
+	}
+}
+
+func TestGitlab_visibilityHelpers(t *testing.T) {
 	cases := []struct {
 		String string
 		Level  gitlab.VisibilityLevelValue

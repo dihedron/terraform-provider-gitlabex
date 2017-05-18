@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/dihedron/terraform/helper/validation"
 	"github.com/hashicorp/terraform/helper/schema"
 	gitlab "github.com/xanzy/go-gitlab"
 )
@@ -12,46 +13,38 @@ func resourceGitlabGroup() *schema.Resource {
 	return &schema.Resource{
 		Create: resourceGitlabGroupCreate,
 		Read:   resourceGitlabGroupRead,
-		//Update: resourceGitlabGroupUpdate,
+		Update: resourceGitlabGroupUpdate,
 		Delete: resourceGitlabGroupDelete,
 
 		Schema: map[string]*schema.Schema{
 			"name": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:         schema.TypeString,
+				Required:     true,
+				ValidateFunc: validateName,
 			},
 			"path": {
-				Type:     schema.TypeString,
-				Required: true,
-				ForceNew: true,
+				Type:         schema.TypeString,
+				Required:     true,
+				ValidateFunc: validatePath,
 			},
 			"description": {
 				Type:     schema.TypeString,
 				Optional: true,
-				ForceNew: true,
 			},
-			/*
-				// this does not seem to be supported by gitlab.Group
-				"visibility_level": {
-					Type:         schema.TypeString,
-					Optional:     true,
-					ValidateFunc: validation.StringInSlice([]string{"private", "internal", "public"}, true),
-					Default:      "private",
-				},
-
-				// these are only available in API v4 or later
-				"lfs_enabled": {
-					Type:     schema.TypeBool,
-					Optional: true,
-					Default:  false,
-				},
-				"request_access_enabled": {
-					Type:     schema.TypeBool,
-					Optional: true,
-					Default:  false,
-				},
-			*/
+			"lfs_enabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+				Computed: true,
+			},
+			"request_access_enabled": {
+				Type:     schema.TypeBool,
+				Optional: true,
+			},
+			"visibility_level": {
+				Type:         schema.TypeString,
+				Optional:     true,
+				ValidateFunc: validation.StringInSlice([]string{"private", "internal", "public"}, true),
+			},
 		},
 	}
 }
@@ -60,6 +53,9 @@ func resourceGitlabGroupSetToState(d *schema.ResourceData, group *gitlab.Group) 
 	d.Set("name", group.Name)
 	d.Set("path", group.Path)
 	d.Set("description", group.Description)
+	d.Set("lfs_enabled", group.LFSEnabled)
+	d.Set("request_access_enabled", group.RequestAccessEnabled)
+	d.Set("visibility_level", visibilityLevelToString(group.VisibilityLevel))
 }
 
 func resourceGitlabGroupCreate(d *schema.ResourceData, meta interface{}) error {
@@ -67,19 +63,25 @@ func resourceGitlabGroupCreate(d *schema.ResourceData, meta interface{}) error {
 	options := &gitlab.CreateGroupOptions{
 		Name: gitlab.String(d.Get("name").(string)),
 		Path: gitlab.String(d.Get("path").(string)),
-		//LFSEnabled:           gitlab.Bool(d.Get("lfs_enabled").(bool)),
-		//RequestAccessEnabled: gitlab.Bool(d.Get("request_access_enabled").(bool)),
 	}
 
 	if v, ok := d.GetOk("description"); ok {
 		options.Description = gitlab.String(v.(string))
 	}
-	/*
-		if v, ok := d.GetOk("visibility_level"); ok {
-			options.VisibilityLevel = stringToVisibilityLevel(v.(string))
-		}
-	*/
-	log.Printf("[DEBUG] create gitlab group %q", options.Name)
+
+	if v, ok := d.GetOk("lfs_enabled"); ok {
+		options.LFSEnabled = gitlab.Bool(v.(bool))
+	}
+
+	if v, ok := d.GetOk("request_access_enabled"); ok {
+		options.RequestAccessEnabled = gitlab.Bool(v.(bool))
+	}
+
+	if v, ok := d.GetOk("visibility_level"); ok {
+		options.VisibilityLevel = stringToVisibilityLevel(v.(string))
+	}
+
+	log.Printf("[DEBUG] create gitlab group %q (path: %q)", options.Name, options.Path)
 
 	group, _, err := client.Groups.CreateGroup(options)
 	if err != nil {
@@ -102,7 +104,6 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 			d.SetId("")
 			return nil
 		}
-
 		return err
 	}
 
@@ -110,27 +111,21 @@ func resourceGitlabGroupRead(d *schema.ResourceData, meta interface{}) error {
 	return nil
 }
 
-/*
 func resourceGitlabGroupUpdate(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)
 
-	// hmmmm looks like this one does not exist: how do we edit groups?
-	options := &gitlab.EditGroupOptions{}
+	options := &gitlab.UpdateGroupOptions{}
 
 	if d.HasChange("name") {
 		options.Name = gitlab.String(d.Get("name").(string))
 	}
 
 	if d.HasChange("path") {
-		options.Name = gitlab.String(d.Get("name").(string))
+		options.Path = gitlab.String(d.Get("path").(string))
 	}
 
 	if d.HasChange("description") {
 		options.Description = gitlab.String(d.Get("description").(string))
-	}
-
-	if d.HasChange("visibility_level") {
-		options.VisibilityLevel = stringToVisibilityLevel(d.Get("visibility_level").(string))
 	}
 
 	if d.HasChange("lfs_enabled") {
@@ -141,16 +136,19 @@ func resourceGitlabGroupUpdate(d *schema.ResourceData, meta interface{}) error {
 		options.RequestAccessEnabled = gitlab.Bool(d.Get("request_access_enabled").(bool))
 	}
 
+	if d.HasChange("visibility_level") {
+		options.VisibilityLevel = stringToVisibilityLevel(d.Get("visibility_level").(string))
+	}
+
 	log.Printf("[DEBUG] update gitlab group %s", d.Id())
 
-	_, _, err := client.Groups.EditGroup(d.Id(), options)
+	_, _, err := client.Groups.UpdateGroup(d.Id(), options)
 	if err != nil {
 		return err
 	}
 
 	return resourceGitlabGroupRead(d, meta)
 }
-*/
 
 func resourceGitlabGroupDelete(d *schema.ResourceData, meta interface{}) error {
 	client := meta.(*gitlab.Client)

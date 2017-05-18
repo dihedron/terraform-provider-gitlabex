@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
+	"github.com/xanzy/go-gitlab"
 )
 
 func TestAccGitlabProjectHook_basic(t *testing.T) {
@@ -23,7 +24,7 @@ func TestAccGitlabProjectHook_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectHookConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectHookExists("zeus_gitlab_project_hook.foo", &hook),
+					testAccCheckGitlabProjectHookExists("gitlabx_project_hook.foo", &hook),
 					testAccCheckGitlabProjectHookAttributes(&hook, &testAccGitlabProjectHookExpectedAttributes{
 						URL:                   fmt.Sprintf("https://example.com/hook-%d", rInt),
 						PushEvents:            true,
@@ -35,7 +36,7 @@ func TestAccGitlabProjectHook_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectHookUpdateConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectHookExists("zeus_gitlab_project_hook.foo", &hook),
+					testAccCheckGitlabProjectHookExists("gitlabx_project_hook.foo", &hook),
 					testAccCheckGitlabProjectHookAttributes(&hook, &testAccGitlabProjectHookExpectedAttributes{
 						URL:                   fmt.Sprintf("https://example.com/hook-%d", rInt),
 						PushEvents:            false,
@@ -54,7 +55,7 @@ func TestAccGitlabProjectHook_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectHookConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectHookExists("zeus_gitlab_project_hook.foo", &hook),
+					testAccCheckGitlabProjectHookExists("gitlabx_project_hook.foo", &hook),
 					testAccCheckGitlabProjectHookAttributes(&hook, &testAccGitlabProjectHookExpectedAttributes{
 						URL:                   fmt.Sprintf("https://example.com/hook-%d", rInt),
 						PushEvents:            true,
@@ -155,7 +156,7 @@ func testAccCheckGitlabProjectHookDestroy(s *terraform.State) error {
 	conn := testAccProvider.Meta().(*gitlab.Client)
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "zeus_gitlab_project" {
+		if rs.Type != "gitlabx_project" {
 			continue
 		}
 
@@ -175,7 +176,7 @@ func testAccCheckGitlabProjectHookDestroy(s *terraform.State) error {
 
 func testAccGitlabProjectHookConfig(rInt int) string {
 	return fmt.Sprintf(`
-resource "zeus_gitlab_project" "foo" {
+resource "gitlabx_project" "foo" {
   name = "foo-%d"
   description = "Terraform acceptance tests"
 
@@ -184,8 +185,8 @@ resource "zeus_gitlab_project" "foo" {
   visibility_level = "public"
 }
 
-resource "zeus_gitlab_project_hook" "foo" {
-	project = "${zeus_gitlab_project.foo.id}"
+resource "gitlabx_project_hook" "foo" {
+	project = "${gitlabx_project.foo.id}"
 	url = "https://example.com/hook-%d"
 }
 	`, rInt, rInt)
@@ -193,7 +194,7 @@ resource "zeus_gitlab_project_hook" "foo" {
 
 func testAccGitlabProjectHookUpdateConfig(rInt int) string {
 	return fmt.Sprintf(`
-resource "zeus_gitlab_project" "foo" {
+resource "gitlabx_project" "foo" {
   name = "foo-%d"
   description = "Terraform acceptance tests"
 
@@ -202,8 +203,8 @@ resource "zeus_gitlab_project" "foo" {
   visibility_level = "public"
 }
 
-resource "zeus_gitlab_project_hook" "foo" {
-	project = "${zeus_gitlab_project.foo.id}"
+resource "gitlabx_project_hook" "foo" {
+	project = "${gitlabx_project.foo.id}"
 	url = "https://example.com/hook-%d"
 	enable_ssl_verification = false
 	push_events = false

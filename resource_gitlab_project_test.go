@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
+	"github.com/xanzy/go-gitlab"
 )
 
 func TestAccGitlabProject_basic(t *testing.T) {
@@ -22,7 +23,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectExists("zeus_gitlab_project.foo", &project),
+					testAccCheckGitlabProjectExists("gitlabx_project.foo", &project),
 					testAccCheckGitlabProjectAttributes(&project, &testAccGitlabProjectExpectedAttributes{
 						Name:                 fmt.Sprintf("foo-%d", rInt),
 						Description:          "Terraform acceptance tests",
@@ -38,7 +39,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectUpdateConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectExists("zeus_gitlab_project.foo", &project),
+					testAccCheckGitlabProjectExists("gitlabx_project.foo", &project),
 					testAccCheckGitlabProjectAttributes(&project, &testAccGitlabProjectExpectedAttributes{
 						Name:            fmt.Sprintf("foo-%d", rInt),
 						Description:     "Terraform acceptance tests!",
@@ -50,7 +51,7 @@ func TestAccGitlabProject_basic(t *testing.T) {
 			{
 				Config: testAccGitlabProjectConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabProjectExists("zeus_gitlab_project.foo", &project),
+					testAccCheckGitlabProjectExists("gitlabx_project.foo", &project),
 					testAccCheckGitlabProjectAttributes(&project, &testAccGitlabProjectExpectedAttributes{
 						Name:                 fmt.Sprintf("foo-%d", rInt),
 						Description:          "Terraform acceptance tests",
@@ -104,13 +105,16 @@ func testAccCheckGitlabProjectAttributes(project *gitlab.Project, want *testAccG
 		if project.Name != want.Name {
 			return fmt.Errorf("got repo %q; want %q", project.Name, want.Name)
 		}
+
 		if project.Description != want.Description {
 			return fmt.Errorf("got description %q; want %q", project.Description, want.Description)
 		}
 
-		if project.DefaultBranch != want.DefaultBranch {
-			return fmt.Errorf("got default_branch %q; want %q", project.DefaultBranch, want.DefaultBranch)
-		}
+		/*
+			if project.DefaultBranch != want.DefaultBranch {
+				return fmt.Errorf("got default_branch %q; want %q", project.DefaultBranch, want.DefaultBranch)
+			}
+		*/
 
 		if project.IssuesEnabled != want.IssuesEnabled {
 			return fmt.Errorf("got issues_enabled %t; want %t", project.IssuesEnabled, want.IssuesEnabled)
@@ -140,7 +144,7 @@ func testAccCheckGitlabProjectDestroy(s *terraform.State) error {
 	conn := testAccProvider.Meta().(*gitlab.Client)
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "zeus_gitlab_project" {
+		if rs.Type != "gitlabx_project" {
 			continue
 		}
 
@@ -160,7 +164,7 @@ func testAccCheckGitlabProjectDestroy(s *terraform.State) error {
 
 func testAccGitlabProjectConfig(rInt int) string {
 	return fmt.Sprintf(`
-resource "zeus_gitlab_project" "foo" {
+resource "gitlabx_project" "foo" {
   name = "foo-%d"
   description = "Terraform acceptance tests"
 
@@ -173,7 +177,7 @@ resource "zeus_gitlab_project" "foo" {
 
 func testAccGitlabProjectUpdateConfig(rInt int) string {
 	return fmt.Sprintf(`
-resource "zeus_gitlab_project" "foo" {
+resource "gitlabx_project" "foo" {
   name = "foo-%d"
   description = "Terraform acceptance tests!"
 

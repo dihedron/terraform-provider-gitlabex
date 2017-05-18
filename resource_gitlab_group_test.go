@@ -7,6 +7,7 @@ import (
 	"github.com/hashicorp/terraform/helper/acctest"
 	"github.com/hashicorp/terraform/helper/resource"
 	"github.com/hashicorp/terraform/terraform"
+	"github.com/xanzy/go-gitlab"
 )
 
 func TestAccGitlabGroup_basic(t *testing.T) {
@@ -22,7 +23,7 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 			{
 				Config: testAccGitlabGroupConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabGroupExists("zeus_gitlab_group.foo", &group),
+					testAccCheckGitlabGroupExists("gitlabx_group.foo", &group),
 					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
 						Name:        fmt.Sprintf("foo-%d", rInt),
 						Path:        fmt.Sprintf("bar-%d", rInt),
@@ -39,7 +40,7 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 			{
 				Config: testAccGitlabGroupUpdateConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabGroupExists("zeus_gitlab_group.foo", &group),
+					testAccCheckGitlabGroupExists("gitlabx_group.foo", &group),
 					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
 						Name:        fmt.Sprintf("foo-%d", rInt),
 						Path:        fmt.Sprintf("bar-%d", rInt),
@@ -54,7 +55,7 @@ func TestAccGitlabGroup_basic(t *testing.T) {
 			{
 				Config: testAccGitlabGroupConfig(rInt),
 				Check: resource.ComposeTestCheckFunc(
-					testAccCheckGitlabGroupExists("zeus_gitlab_group.foo", &group),
+					testAccCheckGitlabGroupExists("gitlabx_group.foo", &group),
 					testAccCheckGitlabGroupAttributes(&group, &testAccGitlabGroupExpectedAttributes{
 						Name:        fmt.Sprintf("foo-%d", rInt),
 						Path:        fmt.Sprintf("bar-%d", rInt),
@@ -136,7 +137,7 @@ func testAccCheckGitlabGroupDestroy(s *terraform.State) error {
 	conn := testAccProvider.Meta().(*gitlab.Client)
 
 	for _, rs := range s.RootModule().Resources {
-		if rs.Type != "zeus_gitlab_group" {
+		if rs.Type != "gitlabx_group" {
 			continue
 		}
 
@@ -156,7 +157,7 @@ func testAccCheckGitlabGroupDestroy(s *terraform.State) error {
 
 func testAccGitlabGroupConfig(rInt int) string {
 	return fmt.Sprintf(`
-resource "zeus_gitlab_group" "foo" {
+resource "gitlabx_group" "foo" {
   name = "foo-%d"
   path = "bar-%d"
   description = "Terraform acceptance tests"
@@ -170,7 +171,7 @@ resource "zeus_gitlab_group" "foo" {
 
 func testAccGitlabGroupUpdateConfig(rInt int) string {
 	return fmt.Sprintf(`
-resource "zeus_gitlab_group" "foo" {
+resource "gitlabx_group" "foo" {
   name = "foo-%d"
   path = "bar-%d"
   description = "Terraform acceptance tests!"
