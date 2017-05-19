@@ -13,6 +13,7 @@ func resourceGitlabProject() *schema.Resource {
 	return &schema.Resource{
 		//SchemaVersion: 1,
 		//MigrateState:  resourceGitlabProjectMigrateState,
+		Exists: resourceGitlabProjectExists,
 		Create: resourceGitlabProjectCreate,
 		Read:   resourceGitlabProjectRead,
 		Update: resourceGitlabProjectUpdate,
@@ -238,6 +239,15 @@ func resourceGitlabProjectSetToState(d *schema.ResourceData, project *gitlab.Pro
 	d.Set("only_allow_merge_if_all_discussions_are_resolved", project.OnlyAllowMergeIfAllDiscussionsAreResolved)
 	d.Set("lfs_enabled", project.LFSEnabled)
 	d.Set("request_access_enabled", project.RequestAccessEnabled)
+}
+
+func resourceGitlabProjectExists(d *schema.ResourceData, meta interface{}) (bool, error) {
+	client := meta.(*gitlab.Client)
+	project, _, err := client.Projects.GetProject(d.Id)
+	if project != nil && err == nil {
+		return true, nil
+	}
+	return false, err
 }
 
 func resourceGitlabProjectCreate(d *schema.ResourceData, meta interface{}) error {

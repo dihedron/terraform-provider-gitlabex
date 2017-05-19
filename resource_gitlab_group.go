@@ -11,6 +11,7 @@ import (
 
 func resourceGitlabGroup() *schema.Resource {
 	return &schema.Resource{
+		Exists: resourceGitlabGroupExists,
 		Create: resourceGitlabGroupCreate,
 		Read:   resourceGitlabGroupRead,
 		Update: resourceGitlabGroupUpdate,
@@ -56,6 +57,15 @@ func resourceGitlabGroupSetToState(d *schema.ResourceData, group *gitlab.Group) 
 	d.Set("lfs_enabled", group.LFSEnabled)
 	d.Set("request_access_enabled", group.RequestAccessEnabled)
 	d.Set("visibility_level", visibilityLevelToString(group.VisibilityLevel))
+}
+
+func resourceGitlabGroupExists(d *schema.ResourceData, meta interface{}) (bool, error) {
+	client := meta.(*gitlab.Client)
+	group, _, err := client.Groups.GetGroup(d.Id)
+	if group != nil && err == nil {
+		return true, nil
+	}
+	return false, err
 }
 
 func resourceGitlabGroupCreate(d *schema.ResourceData, meta interface{}) error {
